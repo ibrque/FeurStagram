@@ -14,6 +14,26 @@ import java.util.HashMap;
  */
 public final class Config {
 
+    /*
+     * HARDWIRED — личная сборка Сергея, отличие от upstream.
+     *
+     * Эти семь поверхностей и вкладка Reels в этой сборке не настраиваются: методы
+     * ниже возвращают константу и в SharedPreferences не заглядывают вовсе. Вместе с
+     * ними прибит `isFollowingFeedOnly` — лента остаётся, но только по подпискам.
+     *
+     * Зачем так, а не тумблерами. Тумблер, который можно выключить, однажды будет
+     * выключен — ровно это и произошло 04.10.2026: блокировки стояли в off, вкладка
+     * Reels была лишь спрятана из панели, и присланный в личку рилс открывал
+     * бесконечную ленту. Настройка, которая защищает от себя же, обязана быть
+     * свойством сборки, а не состоянием, переживающим один неверный тап.
+     *
+     * Соответствующие строки убраны и из экрана настроек (Settings.java): тумблер,
+     * который ничего не меняет, врёт громче, чем его отсутствие.
+     *
+     * Что осталось настраиваемым: сторис, кнопка уведомлений, иконки Search/Create/
+     * Messages/Profile, стартовый экран, тёмная тема, всплывашки, автообновление.
+     */
+
     private static final String PREFS = "feurstagram_prefs";
 
     /**
@@ -120,13 +140,11 @@ public final class Config {
      * "Following" feed) instead of the recommended feed. Off by default. Not a
      * block_* surface, so the permanent lock never freezes it.
      */
-    public static boolean isFollowingFeedOnly() {
-        return getBlocked("limit_following_feed", false);
-    }
+    public static boolean isFollowingFeedOnly() { return true; }  // зашито, см. HARDWIRED
 
     public static boolean isFeedBlocked()      { return getBlocked("block_feed", true); }
-    public static boolean isExploreBlocked()   { return getBlocked("block_explore", true); }
-    public static boolean isReelsBlocked()     { return getBlocked("block_reels", true); }
+    public static boolean isExploreBlocked()   { return true; }   // зашито, см. HARDWIRED
+    public static boolean isReelsBlocked()     { return true; }   // зашито, см. HARDWIRED
     /**
      * Whether the "Friends" tab and its avatar facepile are hidden from the Reels
      * viewer's header. On by default: Instagram gates that entry point behind a
@@ -134,12 +152,12 @@ public final class Config {
      * reachable from an internal developer menu, so the only way out is to drop
      * it from the view tree — issue #94.
      */
-    public static boolean isFriendsLaneBlocked() { return getBlocked("block_friends_lane", true); }
+    public static boolean isFriendsLaneBlocked() { return true; } // зашито, см. HARDWIRED
     public static boolean isStoriesBlocked()   { return getBlocked("block_stories", false); }
-    public static boolean isInstantsBlocked()  { return getBlocked("block_instants", true); }
-    public static boolean isNotesBlocked()     { return getBlocked("block_notes", true); }
-    public static boolean isSuggestedBlocked() { return getBlocked("block_suggested", true); }
-    public static boolean isAdsBlocked()       { return getBlocked("block_ads", true); }
+    public static boolean isInstantsBlocked()  { return true; }   // зашито, см. HARDWIRED
+    public static boolean isNotesBlocked()     { return true; }   // зашито, см. HARDWIRED
+    public static boolean isSuggestedBlocked() { return true; }   // зашито, см. HARDWIRED
+    public static boolean isAdsBlocked()       { return true; }   // зашито, см. HARDWIRED
 
     /**
      * Whether the notifications ("heart") button in the feed header is hidden.
@@ -166,7 +184,7 @@ public final class Config {
      * stay present and tappable. Reels defaults to hidden to preserve the previous
      * behaviour (blocking reels used to also hide the tab).
      */
-    public static boolean isReelsTabShown() { return getBlocked("nav_show_reels", false); }
+    public static boolean isReelsTabShown() { return false; }     // зашито, см. HARDWIRED
 
     /**
      * Whether the first-run coach mark (long-press Home to open settings) has

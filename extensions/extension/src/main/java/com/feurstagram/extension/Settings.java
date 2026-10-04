@@ -431,16 +431,16 @@ public final class Settings {
         root.addView(scroll, new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f));
 
+        // HARDWIRED (см. Config.java): Explore, Reels, Friends in Reels, Instants,
+        // Notes, Suggested accounts и Ads в этой сборке заблокированы всегда, поэтому
+        // их строк здесь нет. Тумблер, который ничего не меняет, врёт громче, чем его
+        // отсутствие; что именно прибито — написано строкой ниже.
         LinearLayout surfaces = addSection(context, column, "Blocked surfaces");
+        addNote(context, column, surfaces,
+                "Зашито в сборке и не отключается: Reels, Explore, рекомендованные "
+                + "аккаунты, реклама, Instants, Notes. Лента \u2014 только по подпискам.");
         addRow(context, surfaces, "Home feed", "block_feed", Config.isFeedBlocked());
-        addRow(context, surfaces, "Explore", "block_explore", Config.isExploreBlocked());
-        addRow(context, surfaces, "Reels", "block_reels", Config.isReelsBlocked());
-        addRow(context, surfaces, "Friends in Reels", "block_friends_lane", Config.isFriendsLaneBlocked());
         addRow(context, surfaces, "Stories", "block_stories", Config.isStoriesBlocked());
-        addRow(context, surfaces, "Instants", "block_instants", Config.isInstantsBlocked());
-        addRow(context, surfaces, "Notes", "block_notes", Config.isNotesBlocked());
-        addRow(context, surfaces, "Suggested accounts", "block_suggested", Config.isSuggestedBlocked());
-        addRow(context, surfaces, "Ads", "block_ads", Config.isAdsBlocked());
         addRow(context, surfaces, "Notifications button", "block_notifications",
                 Config.isNotificationsButtonBlocked());
         sealGroup(context, surfaces);
@@ -454,7 +454,7 @@ public final class Settings {
 
         LinearLayout nav = addSection(context, column, "Navigation bar");
         addRow(context, nav, "Search", "nav_show_search", Config.getBlocked("nav_show_search", true), onNavChanged);
-        addRow(context, nav, "Reels", "nav_show_reels", Config.getBlocked("nav_show_reels", false), onNavChanged);
+        // Вкладки Reels в этой сборке нет совсем — см. HARDWIRED в Config.java.
         addRow(context, nav, "Create", "nav_show_create", Config.getBlocked("nav_show_create", true), onNavChanged);
         addRow(context, nav, "Messages", "nav_show_direct", Config.getBlocked("nav_show_direct", true), onNavChanged);
         addRow(context, nav, "Profile", "nav_show_profile", Config.getBlocked("nav_show_profile", true), onNavChanged);
@@ -713,6 +713,24 @@ public final class Settings {
         label.setLetterSpacing(0.01f);
         label.setPadding(dp(context, 16), dp(context, 24), dp(context, 16), dp(context, 8));
         parent.addView(label);
+    }
+
+    /**
+     * Пояснение под заголовком раздела: что в этой сборке прибито гвоздями и почему
+     * соответствующих тумблеров нет (см. HARDWIRED в Config.java).
+     *
+     * Вставляется В КОЛОНКУ, перед группой строк, а не внутрь группы: sealGroup
+     * раздаёт карточный фон всем детям подряд, и заметка внутри получила бы вид
+     * обычной строки — то есть выглядела бы как тумблер, которого нет.
+     */
+    private static void addNote(Context context, LinearLayout column,
+                                LinearLayout group, String text) {
+        TextView note = new TextView(context);
+        note.setText(text);
+        note.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13f);
+        note.setTextColor(ON_SURFACE_VARIANT);
+        note.setPadding(dp(context, 16), 0, dp(context, 16), dp(context, 12));
+        column.addView(note, Math.max(0, column.indexOfChild(group)));
     }
 
     /** Section label plus the container its rows go into. */
